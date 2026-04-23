@@ -12,10 +12,9 @@ pd.read_sql("""SELECT * FROM sqlite_master""", conn)
 # STEP 1
 # Return first and last names and job titles for all employees in Boston
 df_boston = pd.read_sql("""
-    SELECT e.firstName, e.lastName, e.jobTitle
-    FROM employees e
-    JOIN offices o ON e.officeCode = o.officeCode
-    WHERE o.city = 'Boston'
+    SELECT firstName, lastName, jobTitle
+    FROM employees
+    WHERE officeCode = (SELECT officeCode FROM offices WHERE city = 'Boston')
 """, conn)
 
 # STEP 2
@@ -102,7 +101,7 @@ df_customers = pd.read_sql("""
 # STEP 10
 # Employees who sold products ordered by fewer than 20 customers (using subquery)
 df_under_20 = pd.read_sql("""
-    SELECT DISTINCT e.employeeNumber, e.firstName, e.lastName, o.city, e.officeCode
+    SELECT DISTINCT e.employeeNumber, e.firstName, e.lastName, e.officeCode
     FROM employees e
     JOIN customers c ON e.employeeNumber = c.salesRepEmployeeNumber
     JOIN orders ord ON c.customerNumber = ord.customerNumber
@@ -121,7 +120,7 @@ df_under_20 = pd.read_sql("""
 # Close the connection
 conn.close()
 
-# Optional: Print confirmation
+# Print confirmation
 print("All queries completed successfully!")
 print(f"STEP 1 - Boston employees: {len(df_boston)}")
 print(f"STEP 2 - Offices with no employees: {len(df_zero_emp)}")
